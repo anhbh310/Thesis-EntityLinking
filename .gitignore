@@ -3,4 +3,7 @@
 PhoBERT_base_fairseq.tar.gz
 PhoBERT_base_fairseq/
 vncorenlp/*
-test
+test/
+**/__pycache__/
+.ipynb_checkpoints
+*.pyc

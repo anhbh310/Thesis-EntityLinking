@@ -1,4 +1,6 @@
 from mediawiki import MediaWiki, mediawiki
+import mwparserfromhell
+import re
 
 
 @mediawiki.memoize
@@ -65,3 +67,51 @@ def get_page_content(page_id):
     except:
         return ""
     return p.content
+
+def get_first_paragraph(page_id):
+    def parse_section(s):
+        opn = [m.start() for m in re.finditer('{{', s)]
+        cls = [m.start() for m in re.finditer('}}', s)]
+        # print(len(opn), len(cls))
+        # print(opn)
+        # print(cls)
+        opn.append(1e20)
+        ret = []
+        d, c = 0, 0
+        pivot = 0
+        start = -1
+        depth = 0
+        if len(cls) > 0:
+            while pivot < cls[-1]:
+                pivot = min(opn[d], cls[c])
+                if start == -1:
+                    start = pivot
+                if pivot == opn[d]:
+                    depth += 1
+                    if d < len(opn) - 1:
+                        d += 1
+                else:
+                    depth -= 1
+                    if depth == 0:
+                        ret.append(s[start:cls[c]+2])
+                        start = cls[c]+3
+                    c += 1
+                # print(d, c, depth)
+        else:
+            start = 0
+        ret.append(s[start:])
+        counter = 0
+        # print(ret)
+        for i in range(len(ret)):
+            obj = ret[i]
+            if obj[0:2] == "{{" and obj[-2:] == "}}":
+                counter += 1
+        ret = ret[counter:]
+        first_paragraph = "".join(part for part in ret)
+
+        return first_paragraph
+    
+    global wikipedia
+    raw_wiki = wikipedia.wiki_request(params={"action":"parse", "pageid":page_id, "section":0, "prop":"wikitext"})
+    return mwparserfromhell.parse(parse_section(str(raw_wiki["parse"]["wikitext"]["*"]))).strip_code()
+    

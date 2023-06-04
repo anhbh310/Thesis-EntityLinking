@@ -27,37 +27,38 @@ def get_word_after_segmentation():
 	# TODO later
 	pass
 
+def reformat_entity_mention(s):
+    return rdrsegmenter.tokenize(s)[0][0]
 
 def get_word_embedding(input_text):
-	# To perform word (and sentence) segmentation
-	#sentences = rdrsegmenter.word_segment(input_text)
-        sentences = rdrsegmenter.tokenize(input_text)
-	# print(sentences)
-        sentence = ""
-        for sen in sentences:
-            sentence += " ".join(sen)
-	# print(sentence)
-	
-	# Extract the last layer's features
-        last_layer_features = phobert.extract_features_aligned_to_words(sentence)
-        #print(last_layer_features.size())
-        ret = []
-        for tok in last_layer_features:
-		# print('{:10}{} (...) {}'.format(str(tok), tok.vector[:5], tok.vector.size()))
-            ret.append((str(tok), tok.vector))
-        return ret
+    # To perform word (and sentence) segmentation  
+    sentences = rdrsegmenter.tokenize(input_text)
+    sentence = ""
+    for sen in sentences:
+        sentence += " ".join(sen)
+
+    # Extract the last layer's features
+    last_layer_features = phobert.extract_features_aligned_to_words(sentence)
+    #print(last_layer_features.size())
+    ret = []
+    for tok in last_layer_features:
+    # print('{:10}{} (...) {}'.format(str(tok), tok.vector[:5], tok.vector.size()))
+        ret.append((str(tok), tok.vector))
+    return ret
 
 
 def get_word_embedding_from_doc(entity_mention, sentences):
-	tensor_stack = []
-	for input_doc in sentences:
+    tensor_stack = []
+    # print(entity_mention)
+    for input_doc in sentences:
             try:
                 ret = get_word_embedding(input_doc)
             except:
                 ret = []
             for t in ret:
+                # print(t[0])
                 if t[0] == entity_mention:
                     tensor_stack.append(t[1])
             if len(tensor_stack) == 0:
                     return None
-	return torch.stack(tensor_stack).mean(dim=0)
+    return torch.stack(tensor_stack).mean(dim=0)
