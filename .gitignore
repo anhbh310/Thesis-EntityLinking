@@ -1,0 +1,6 @@
+.idea/
+.ipynb_checkpoints/
+PhoBERT_base_fairseq.tar.gz
+PhoBERT_base_fairseq/
+vncorenlp/*
+test
