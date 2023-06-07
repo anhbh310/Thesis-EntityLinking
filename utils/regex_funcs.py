@@ -7,5 +7,5 @@ def get_main_article(text):
 
 
 def get_sentences(text):
-    pat = re.compile(r'([A-Z][^\.!?]*[\.!?])', re.M)
+    pat = re.compile(r'([A-ZÁÀẢÃẠÂẤẦẨẪẬĂẮẰẴẶÉÈẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỚỜỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴ][^\.!?]*[\.!?])', re.UNICODE)
     return pat.findall(text)
