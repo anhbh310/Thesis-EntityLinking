@@ -28,7 +28,7 @@ def get_word_after_segmentation():
 	pass
 
 def reformat_entity_mention(s):
-    return rdrsegmenter.tokenize(s)[0][0]
+    return rdrsegmenter.tokenize(s)[0]
 
 def get_word_embedding(input_text):
     # To perform word (and sentence) segmentation  
@@ -48,17 +48,42 @@ def get_word_embedding(input_text):
 
 
 def get_word_embedding_from_doc(entity_mention, sentences):
+    def get_entity_mention_position(mention, sen):
+        ret = []
+        s = 0
+        for p in range(len(sen)):
+            if sen[p][0] == mention[s]:
+                s += 1
+                if s == len(mention):
+                    ret.append(p - len(mention) + 1)
+                    s = 0
+                continue
+            s = 0
+        return ret
+    
+    def get_embeded_entity_mention(position, mention_size, sen):
+        ret = []
+        for i in position:
+            temp_slice = [token[1] for token in sen[i:i + mention_size]]
+            ret.append(torch.stack(temp_slice).mean(dim=0))
+        # print("size of mention: {}".format(len(ret)))
+        return ret
+
     tensor_stack = []
+    normalized_entity_mention = [i.lower() for i in entity_mention]
     # print(entity_mention)
     for input_doc in sentences:
-            try:
-                ret = get_word_embedding(input_doc)
-            except:
-                ret = []
-            for t in ret:
-                # print(t[0])
-                if t[0] == entity_mention:
-                    tensor_stack.append(t[1])
-            if len(tensor_stack) == 0:
-                    return None
+        try:
+            ret = get_word_embedding(input_doc.lower())
+        except:
+            ret = []
+        # Get embeded tensors of entity mention variant
+        if len(normalized_entity_mention) > 0:
+            # Get full size
+            tensor_stack += get_embeded_entity_mention(get_entity_mention_position(normalized_entity_mention, ret), len(normalized_entity_mention), ret)
+            pass
+        # Get first token
+        tensor_stack += get_embeded_entity_mention(get_entity_mention_position(normalized_entity_mention[0:1], ret), 1, ret)
+    if len(tensor_stack) == 0:
+        return None
     return torch.stack(tensor_stack).mean(dim=0)
