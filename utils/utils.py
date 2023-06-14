@@ -1,4 +1,4 @@
-from .regex_funcs import get_sentences
+from .regex_funcs import *
 
 
 def search_sentence_with_keyword(r_entity_mention, page_content):

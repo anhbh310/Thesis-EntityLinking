@@ -28,7 +28,17 @@ def get_word_after_segmentation():
 	pass
 
 def reformat_entity_mention(s):
-    return rdrsegmenter.tokenize(s)[0]
+    segmented_token = rdrsegmenter.tokenize(s)[0]
+    ret = []
+    for token in segmented_token:
+        if "-" in token:
+            sub_tokens = token.split("-")
+            for s_token in sub_tokens:
+                ret += [s_token, "-"]
+            ret = ret[:len(ret) - 1]
+        else:
+            ret += [token]
+    return ret
 
 def get_word_embedding(input_text):
     # To perform word (and sentence) segmentation  
@@ -36,6 +46,7 @@ def get_word_embedding(input_text):
     sentence = ""
     for sen in sentences:
         sentence += " ".join(sen)
+    # print("after tokenize: {}".format(sentence))
 
     # Extract the last layer's features
     last_layer_features = phobert.extract_features_aligned_to_words(sentence)
@@ -49,9 +60,12 @@ def get_word_embedding(input_text):
 
 def get_word_embedding_from_doc(entity_mention, sentences):
     def get_entity_mention_position(mention, sen):
+        # print("--- In get position ---")
+        # print("{} --- ".format(mention))
         ret = []
         s = 0
         for p in range(len(sen)):
+            # print("here {}=== {}".format(sen[p][0], mention[s]))
             if sen[p][0] == mention[s]:
                 s += 1
                 if s == len(mention):
@@ -59,6 +73,7 @@ def get_word_embedding_from_doc(entity_mention, sentences):
                     s = 0
                 continue
             s = 0
+        # print("Position: {}".format(ret))
         return ret
     
     def get_embeded_entity_mention(position, mention_size, sen):
@@ -71,15 +86,20 @@ def get_word_embedding_from_doc(entity_mention, sentences):
 
     tensor_stack = []
     normalized_entity_mention = [i.lower() for i in entity_mention]
-    # print(entity_mention)
+    print("after normalize entity_mention {}".format(normalized_entity_mention))
+    # print("length {}".format(len(normalized_entity_mention)))
+    # print("length of sentence: {}".format(len(sentences)))
+    # print(sentences)
     for input_doc in sentences:
+        # print("input doc {}".format(input_doc.lower()))
         try:
             ret = get_word_embedding(input_doc.lower())
         except:
             ret = []
         # Get embeded tensors of entity mention variant
-        if len(normalized_entity_mention) > 0:
+        if len(normalized_entity_mention) > 1:
             # Get full size
+            # print("processing full size")
             tensor_stack += get_embeded_entity_mention(get_entity_mention_position(normalized_entity_mention, ret), len(normalized_entity_mention), ret)
             pass
         # Get first token
