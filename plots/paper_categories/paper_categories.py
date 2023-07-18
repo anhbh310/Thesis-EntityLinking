@@ -59,5 +59,5 @@ for i, p, d in zip(b1 + b2 + b3 + b4 + b5 + b6 + b7, prop, data_text):
     ax.text(i.get_x() - 0.14 + i.get_width()/2 - 0.17, px + 0.1, "   {}\n({:.2f}%)".format(d, p*100))
 # %%
 # Show plot
-plt.savefig("entity_categories.pdf")
+plt.savefig("paper_categories.pdf")
 plt.show()
