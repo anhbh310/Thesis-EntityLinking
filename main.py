@@ -65,6 +65,6 @@ def handle_entity_linking():
     return jsonify({"ret": {}}), 200
 
 if __name__ == '__main__':
-    # app.run(host='0.0.0.0', port=8091)
-    print(ranking_process(r_entity_mention="Tesla",
-                          in_doc="Vì vậy những nước trong khu vực như Trung Quốc, Thái Lan, Philippines đang đầu tư mạnh cơ sở hạ tầng để phát triển loại xe này.Việt Nam cũng đang nằm trong xu hướng chung này.Song để phát triển ô tô điện thì Việt Nam cần nhiều giải pháp đồng bộ và có thể làm từ thấp đến cao (chẳng hạn bắt đầu từ vỏ xe) chứ không phải là thả lỏng kiểm soát vấn đề an toàn để kích thích loại xe này phát triển.Ông Đại dẫn chứng: Ngay cả hãng xe điện Tesla (Mỹ) được coi là lớn nhất thế giới còn không có chính sách mở đại lý, họ tự làm vì muốn đảm bảo tốt nhất chất lượng cho người tiêu dùng, chịu trách nhiệm vì công nghệ đòi hỏi kỹ thuật cao."))
+    app.run(host='0.0.0.0', port=8091)
+    # print(ranking_process(r_entity_mention="Brazil",
+    #                       in_doc="Bạn có thể nói các ngôn ngữ khác: Trợ lý ảo Google Assistant có khả năng nói các ngôn ngữ khác nhau ở các quốc gia trên thế giới.Chúng sẽ nói tiếng Ý khi ở Ý, tiếng Tây Ban Nha ở Mexico, tiếng Pháp ở Canada, tiếng Bồ Đào Nha ở Brazil...Bạn có thể kiểm tra danh sách đầy đủ các ngôn ngữ có sẵn trên blog của Google.11.Tìm thợ ống nước, người làm vườn... ở gần khu vực nhà bạn: Chỉ cần nói OK Google, find me a plumber, Google Home sẽ liệt kê những người thợ sửa ống nước gần khu vực bạn ở để bạn lựa chọn.12."))
