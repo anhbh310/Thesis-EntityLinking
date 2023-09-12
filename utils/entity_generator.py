@@ -81,7 +81,7 @@ def get_first_paragraph(page_id):
         pivot = 0
         start = -1
         depth = 0
-        if len(cls) > 0:
+        if len(cls) > 0 and opn[-1] < 1500:
             while pivot < cls[-1]:
                 pivot = min(opn[d], cls[c])
                 if start == -1:

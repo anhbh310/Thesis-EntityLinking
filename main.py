@@ -40,8 +40,6 @@ def ranking_process(r_entity_mention, in_doc):
             candidate_embed = get_word_embedding_from_doc(entity_mention=reformat_entity_mention(remove_type_from_entity_name(page[0])), sentences=sentences)
             if candidate_embed is not None:
                 ranking_ret.append((page, calculate_similar(src_embed, candidate_embed)))
-    # if len(ranking_ret) == 0:
-    #     print("Can not find ")
     return ranking_ret
 
 @app.route('/el', methods=['GET', 'POST'])

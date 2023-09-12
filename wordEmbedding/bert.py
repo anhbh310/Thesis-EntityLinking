@@ -60,13 +60,11 @@ def get_word_embedding(input_text):
 
 def get_word_embedding_from_doc(entity_mention, sentences):
     def get_entity_mention_position(mention, sen):
-        # print("--- In get position ---")
-        # print("{} --- ".format(mention))
         ret = []
         s = 0
         for p in range(len(sen)):
-            # print("here {}=== {}".format(sen[p][0], mention[s]))
-            if sen[p][0] == mention[s]:
+            print("here {}=== {}".format(sen[p][0], mention[s]))
+            if sen[p][0].lower() == mention[s]:
                 s += 1
                 if s == len(mention):
                     ret.append(p - len(mention) + 1)
@@ -93,13 +91,12 @@ def get_word_embedding_from_doc(entity_mention, sentences):
     for input_doc in sentences:
         # print("input doc {}".format(input_doc.lower()))
         try:
-            ret = get_word_embedding(input_doc.lower())
+            ret = get_word_embedding(input_doc)
         except:
             ret = []
         # Get embeded tensors of entity mention variant
         if len(normalized_entity_mention) > 1:
             # Get full size
-            # print("processing full size")
             tensor_stack += get_embeded_entity_mention(get_entity_mention_position(normalized_entity_mention, ret), len(normalized_entity_mention), ret)
             pass
         # Get first token
