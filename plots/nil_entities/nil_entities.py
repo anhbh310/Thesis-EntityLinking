@@ -7,7 +7,7 @@ color_scheme = ["#70C4A5".lower(), "#366CC7".lower(), "#2B2191".lower(), "#FDF2B
 plt.rcParams["font.family"] = "DeJavu Serif"
 plt.rcParams["font.serif"] = ["Times New Roman"]
 # Create figure objects
-figsize_cfg = (5, 2)
+figsize_cfg = (5, 1.5)
 fig = plt.figure(figsize=figsize_cfg)
 
 # %%
@@ -23,9 +23,9 @@ ax.tick_params(top=False, bottom=False, left=False, right=False, labelbottom=Fal
 
 # %%
 # Data
-data = [289, 428, 151, 592]
+data = [140, 1320]
 data_text = [str(i) for i in data]
-label = ["PER", "LOC", "ORG", "MISC"]
+label = ["NIL", ""]
 
 prop = [i/sum(data) for i in data]
 print(prop)
@@ -35,25 +35,23 @@ t = [i*figsize_cfg[0] for i in prop]
 # Draw stacked bar
 w = 1
 start_anchor = 0.2
-b1 = ax.barh(y=1.7, width=t[0], left=start_anchor, height=w)
-b2 = ax.barh(y=1.7, width=t[1], left=start_anchor + t[0], height=w)
-b3 = ax.barh(y=1.7, width=t[2], left=start_anchor + t[0] + t[1], height=w)
-b4 = ax.barh(y=1.7, width=t[3], left=start_anchor + t[0] + t[1] + t[2], height=w)
+b1 = ax.barh(y=1.9, width=t[0], left=start_anchor, height=w)
+b2 = ax.barh(y=1.9, width=t[1], left=start_anchor + t[0], height=w)
 
 # %%
 # Draw legend
-ax.legend([b1, b2, b3, b4], 
-          ["Person", "Location", "Organization", "Misc"], 
+ax.legend([b1, b2], 
+          ["Nil", "Others"], 
           bbox_to_anchor=(0.64, 0.92),
           loc="upper left",
           prop={"size": 10})
 
 # %%
 # Add text
-for i, p, d in zip(b1 + b2 + b3 + b4, prop, data_text):
+for i, p, d in zip(b1 + b2, prop, data_text):
     h = i.get_height()
-    ax.text(i.get_x() - 0.14 + i.get_width()/2 - 0.17, h - 0.75, "   {}\n({:.2f}%)".format(d, p*100))
+    ax.text(i.get_x() - 0.14 + i.get_width()/2 - 0.12, h - 0.9, "  {}\n({:.2f}%)".format(d, p*100))
 # %%
 # Show plot
-plt.savefig("entity_categories.pdf")
+plt.savefig("nil_entities.pdf")
 plt.show()

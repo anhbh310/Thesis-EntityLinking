@@ -3,13 +3,24 @@ import torch
 # Load rdrsegmenter from VnCoreNLP
 #import py_vncorenlp
 from vncorenlp import VnCoreNLP
-from transformers import AutoModel, AutoTokenizer
+from fairseq.models.roberta import RobertaModel
+from fairseq.data.encoders.fastbpe import fastBPE
+from fairseq import options
 
 rdrsegmenter = VnCoreNLP("/home/anh/workspace/CandidateEntityRanking/vncorenlp/VnCoreNLP-1.2.jar", annotators="wseg",
                                                  max_heap_size='-Xmx500m')
+#py_vncorenlp.download_model(save_dir='/home/anh/workspace/CandidateEntityRanking/vncorenlp')
+#rdrsegmenter = py_vncorenlp.VnCoreNLP(annotators=["wseg"], save_dir='/home/anh/workspace/CandidateEntityRanking/vncorenlp')
 
-phobert = AutoModel.from_pretrained("vinai/phobert-base-v2")
-tokenizer = AutoTokenizer.from_pretrained("vinai/phobert-base-v2")
+phobert = RobertaModel.from_pretrained("/home/anh/workspace/CandidateEntityRanking/PhoBERT_base_fairseq", checkpoint_file='model.pt')
+
+# Incorporate the BPE encoder into PhoBERT-base
+parser = options.get_preprocessing_parser()
+parser.add_argument('--bpe-codes', type=str, help='path to fastBPE BPE',
+					default="/home/anh/workspace/CandidateEntityRanking/PhoBERT_base_fairseq/bpe.codes")
+args = parser.parse_args()
+# Incorporate the BPE encoder into PhoBERT
+phobert.bpe = fastBPE(args)
 
 
 def get_word_after_segmentation():
@@ -38,17 +49,13 @@ def get_word_embedding(input_text):
     # print("after tokenize: {}".format(sentence))
 
     # Extract the last layer's features
-    input_ids = torch.tensor([tokenizer.encode(sentence)])
+    last_layer_features = phobert.extract_features_aligned_to_words(sentence)
+    #print(last_layer_features.size())
     ret = []
-    with torch.no_grad():
-        features = phobert(input_ids) 
-        last_layer_features = features.last_hidden_state
-        #print(last_layer_features.size())
-        # import pdb;pdb.set_trace()
-        for i in len(input_ids[0]):
-            # import pdb;pdb.set_trace()
-            ret.append((str(tokenizer.decode(input_ids[0][i])), last_layer_features[0, i, :]))
-    print(len(ret))
+    for tok in last_layer_features:
+    # print('{:10}{} (...) {}'.format(str(tok), tok.vector[:5], tok.vector.size()))
+        ret.append((str(tok), tok.vector))
+        # import pdb; pdb.set_trace()
     return ret
 
 
