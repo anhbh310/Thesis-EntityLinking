@@ -1,10 +1,12 @@
 import torch.nn
+import gc
 from utils.utils import *
 from utils.entity_generator import *
 
 # from wordEmbedding.bert_fair import get_word_embedding, get_word_embedding_from_doc, reformat_entity_mention
 # from wordEmbedding.bert import get_word_embedding, get_word_embedding_from_doc, reformat_entity_mention
-from wordEmbedding.bert_multilingual import get_word_embedding_from_doc
+from wordEmbedding.bert_multilingual import get_word_embedding_from_doc, reformat_entity_mention
+# from wordEmbedding.bert_xlm_roberta import get_word_embedding_from_doc, reformat_entity_mention
 
 from flask import Flask, Response, request, jsonify
 
@@ -68,7 +70,7 @@ def ranking_process_with_multilingual(r_entity_mention, in_doc):
         if len(sentences) != 0:
             candidate_embed = get_word_embedding_from_doc(entity_mention=remove_type_from_entity_name(page[0]), sentences=sentences)
             if candidate_embed is not None:
-                ranking_ret.append((page, candidate_embed))
+                ranking_ret.append((page, torch.nn.functional.cosine_similarity(src_embed, candidate_embed, dim=1)))
     return ranking_ret
 
 @app.route('/el', methods=['GET', 'POST'])
@@ -90,6 +92,7 @@ def handle_entity_linking():
     if ret_entity is not None:
         return jsonify({"ret": {"entity_name": ret_entity[0][0],
                                 "url": "https://vi.wikipedia.org/?curid={}".format(ret_entity[0][1])}}), 200
+    gc.collect()
     return jsonify({"ret": {}}), 200
 
 if __name__ == '__main__':

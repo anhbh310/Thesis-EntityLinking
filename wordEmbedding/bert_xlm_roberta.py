@@ -1,8 +1,9 @@
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 import torch
+import gc
 
-tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-cased')
-model = AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-cased")
+tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-large')
+model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large")
 
 def reformat_entity_mention(s):
     return s
