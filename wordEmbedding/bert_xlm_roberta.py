@@ -5,6 +5,15 @@ import gc
 tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-large')
 model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large")
 
+def get_mem():
+    # prints currently alive Tensors and Variables
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                print(type(obj), obj.size())
+        except:
+            pass
+
 def reformat_entity_mention(s):
     return s
 
@@ -14,7 +23,7 @@ def find_mention_similarity(embedding_first, embedding_second):
 def get_embedding(sentence):
     encoded_input = tokenizer(sentence, return_tensors='pt')
     output = model(**encoded_input)
-    return output.logits, encoded_input.input_ids
+    return output.logits.detach(), encoded_input.input_ids
 
 def get_entity_mention_position(encoded_doc, encoded_mention):
     ret = []
@@ -36,9 +45,8 @@ def get_word_embedding_from_doc(entity_mention, sentences):
 
         # Get all the embeded_candidate
         for p in matching_pos:
-
             ret.append(embedding[:, p:p+len(tokenized_mention[0, :])-2, :])
     # import pdb; pdb.set_trace()
     if len(ret) == 0:
         return None
-    return torch.stack(ret).mean(dim=0).mean(dim=1)
+    return torch.stack(ret).mean(dim=0).mean(dim=1).detach()

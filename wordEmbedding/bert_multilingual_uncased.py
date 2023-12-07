@@ -1,8 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForMaskedLM
 import torch
 
-tokenizer = AutoTokenizer.from_pretrained('FPTAI/vibert-base-cased')
-model = AutoModelForMaskedLM.from_pretrained("FPTAI/vibert-base-cased")
+tokenizer = AutoTokenizer.from_pretrained('bert-base-multilingual-uncased')
+model = AutoModelForMaskedLM.from_pretrained("bert-base-multilingual-uncased")
 
 def reformat_entity_mention(s):
     return s
@@ -13,7 +13,7 @@ def find_mention_similarity(embedding_first, embedding_second):
 def get_embedding(sentence):
     encoded_input = tokenizer(sentence, return_tensors='pt')
     output = model(**encoded_input)
-    return output.logits.detach(), encoded_input.input_ids
+    return output.logits, encoded_input.input_ids
 
 def get_entity_mention_position(encoded_doc, encoded_mention):
     ret = []
@@ -35,8 +35,9 @@ def get_word_embedding_from_doc(entity_mention, sentences):
 
         # Get all the embeded_candidate
         for p in matching_pos:
+
             ret.append(embedding[:, p:p+len(tokenized_mention[0, :])-2, :])
     # import pdb; pdb.set_trace()
     if len(ret) == 0:
         return None
-    return torch.stack(ret).mean(dim=0).mean(dim=1).detach()
+    return torch.stack(ret).mean(dim=0).mean(dim=1)
