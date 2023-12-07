@@ -1,14 +1,19 @@
-import torch.nn
 import gc
+import sys
+
+import torch.nn
+from flask import Flask, Response, request, jsonify
+
 from utils.utils import *
 from utils.entity_generator import *
 
 # from wordEmbedding.bert_fair import get_word_embedding, get_word_embedding_from_doc, reformat_entity_mention
 # from wordEmbedding.bert import get_word_embedding, get_word_embedding_from_doc, reformat_entity_mention
-from wordEmbedding.bert_multilingual import get_word_embedding_from_doc, reformat_entity_mention
+# from wordEmbedding.bert_multilingual import get_word_embedding_from_doc, reformat_entity_mention
+from wordEmbedding.bert_multilingual_uncased import get_word_embedding_from_doc, reformat_entity_mention
 # from wordEmbedding.bert_xlm_roberta import get_word_embedding_from_doc, reformat_entity_mention
+# from wordEmbedding.bert_vibert import get_word_embedding_from_doc, reformat_entity_mention
 
-from flask import Flask, Response, request, jsonify
 
 app = Flask(__name__)
 
@@ -94,6 +99,9 @@ def handle_entity_linking():
                                 "url": "https://vi.wikipedia.org/?curid={}".format(ret_entity[0][1])}}), 200
     gc.collect()
     return jsonify({"ret": {}}), 200
+@app.route('/check', methods=['GET'])
+def handle_check():
+    return jsonify({"status": "READY"}), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8091)
