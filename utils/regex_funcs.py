@@ -2,7 +2,7 @@ import re
 
 
 def get_sentences(text):
-    pat = re.compile(r'([A-ZÁÀẢÃẠÂẤẦẨẪẬĂẮẰẴẶÉÈẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỚỜỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴ][^\.!?]*[\.!?])', re.UNICODE)
+    pat = re.compile(r'([A-ZÁÀẢÃẠÂẤẦẨẪẬĂẮẰẴẶÉÈẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỚỜỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ][^\.!?]*[\.!?])', re.UNICODE)
     return pat.findall(text)
 
 def remove_type_from_entity_name(text):
