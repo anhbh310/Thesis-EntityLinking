@@ -2,8 +2,13 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM
 import torch
 import gc
 
+import sys
+sys.path.insert(0, '..')
+from utils.chroma_cli import add_data, get_data
+
 tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-large')
 model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large")
+collection_name = "roberta_large"
 
 def get_mem():
     # prints currently alive Tensors and Variables
@@ -32,21 +37,39 @@ def get_entity_mention_position(encoded_doc, encoded_mention):
             ret.append(i)
     return ret
 
-def get_word_embedding_from_doc(entity_mention, sentences):
+def get_word_embedding_from_doc(entity_mention, sentences, page_id=None):
 
-    # Embed the entity_mention
-    embeded_mention, tokenized_mention = get_embedding(entity_mention)
-    ret = []
+    def embed():
+        # Embed the entity_mention
+        embeded_mention, tokenized_mention = get_embedding(entity_mention)
+        ret = []
 
-    for sen in sentences:
-        embedding, tokenized_sen = get_embedding(sen)
+        for sen in sentences:
+            embedding, tokenized_sen = get_embedding(sen)
 
-        matching_pos = get_entity_mention_position(tokenized_sen[0, :], tokenized_mention[0, :])
+            matching_pos = get_entity_mention_position(tokenized_sen[0, :], tokenized_mention[0, :])
 
-        # Get all the embeded_candidate
-        for p in matching_pos:
-            ret.append(embedding[:, p:p+len(tokenized_mention[0, :])-2, :])
-    # import pdb; pdb.set_trace()
-    if len(ret) == 0:
-        return None
-    return torch.stack(ret).mean(dim=0).mean(dim=1).detach()
+            # Get all the embeded_candidate
+            for p in matching_pos:
+                ret.append(embedding[:, p:p+len(tokenized_mention[0, :])-2, :])
+        # import pdb; pdb.set_trace()
+        if len(ret) == 0:
+            return None
+        return torch.stack(ret).mean(dim=0).mean(dim=1).detach()
+    
+    if page_id is not None:
+        # Query from chromadb
+        d = get_data(collection_name, page_id)
+        if d is not None:
+            print("cached")
+            return torch.tensor(d)
+        
+        embed_ret = embed()
+        add_data(collection_name, embed_ret[0].tolist(), {"entity": entity_mention}, page_id)
+        return embed_ret
+    else:
+        embed_ret = embed()
+        return embed_ret
+        
+
+    
