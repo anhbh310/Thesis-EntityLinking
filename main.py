@@ -90,8 +90,6 @@ def ranking_process_with_multilingual(r_entity_mention, in_doc, candidate_entiti
 @app.route('/el', methods=['GET', 'POST'])
 def handle_entity_linking():
     def is_the_mention_unlinkable(best_candidate, ranking_list):
-        # print(best_candidate)
-        # print(ranking_list)
         for c in ranking_list:
             print(c)
             if c[0][0] == best_candidate[0] and c[1] <= 0.2:
@@ -106,7 +104,6 @@ def handle_entity_linking():
 
         # Multilingual bert
         multilingual_ranking = ranking_process_with_multilingual(r_entity_mention=entity_mention, in_doc=in_doc, candidate_entities=page_lst)
-        # print("Time elapsed after multilingual ranking {}".format(measure_time()))
         multilingual_ranking.sort(key=lambda x:x[1], reverse=True)
         print("Multilingual: {}".format(multilingual_ranking))
 
@@ -135,11 +132,13 @@ def handle_entity_linking():
 
         max_entity = max(p, key=p.get)
         result = ast.literal_eval(str(max_entity))
+        print("Time elapsed in candidate ranking {}".format(measure_time()))
         if is_unlinkable_part_exist and is_the_mention_unlinkable(result, phobert_ranking):
             return None
+        print("Time elapsed in prediction unlinkable {}".format(measure_time()))
         return result
     
-    # print("Time elapsed before receiving the request {}".format(measure_time()))
+    print("Time elapsed before receiving the request {}".format(measure_time()))
     data = request.json
     mention, doc = data["entity_mention"], data["in_doc"]
 
@@ -149,7 +148,7 @@ def handle_entity_linking():
     if len(page_lst) == 0:
         return jsonify({"ret":{"entity_name": "NIL",
                            "url": "NIL"}}), 200
-    # print("Time elapsed in Candidate generation duration {}".format(measure_time()))
+    print("Time elapsed in Candidate generation duration {}".format(measure_time()))
     
     ret_entity = find_most_relevant_entity(entity_mention=mention, in_doc=doc)
     if ret_entity is not None:
