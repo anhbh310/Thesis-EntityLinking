@@ -23,7 +23,7 @@ ax.tick_params(top=False, bottom=False, left=False, right=False, labelbottom=Fal
 
 # %%
 # Data
-data = [169, 400, 195, 188, 176, 103, 229]
+data = [169, 409, 195, 188, 176, 254, 229]
 print(sum(data))
 data_text = [str(i) for i in data]
 label = ["Công nghệ", "Giải trí", "Giáo dục", "Khoa học", "Kinh tế", "Thế giới", "Văn hóa"] 

@@ -23,7 +23,7 @@ ax.tick_params(top=False, bottom=False, left=False, right=False, labelbottom=Fal
 
 # %%
 # Data
-data = [140, 1320]
+data = [160, 1460]
 data_text = [str(i) for i in data]
 label = ["NIL", ""]
 
