@@ -77,6 +77,12 @@ b2 = axes_ins.barh(y=0.5, width=t[1], left=t[0], height=axes_ins_cfg_ylim)
 ax.plot((rect_ul[0], axes_ul[0]), (rect_ul[1], axes_ul[1]), linewidth=0.3, color="#000000")
 ax.plot((rect_dr[0], axes_dr[0]), (rect_dr[1], axes_dr[1]), linewidth=0.3, color="#000000")
 
+# Remove border
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+
 # Show plot
 plt.savefig("ExecTimeAttribution.pdf")
 plt.show()
